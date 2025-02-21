@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Response, status, Depends, HTTPException
+from fastapi import APIRouter, Response, status, Depends, HTTPException, Form
 from sqlmodel import Session, select
 from app.core.db import db_session
 from app.models.users import User
@@ -43,8 +43,8 @@ async def create_new_user(user_data: User, user_auth: Auth= Depends(get_user_aut
 
 
 @user_router.post("/signin")
-async def sign_in(response: Response, user_email: str, user_password: str, user_auth: Auth = Depends(get_user_auth)):
-    is_user_exist = user_auth.get_user_by_email(user_email)  # Removed await
+async def sign_in(response: Response, user_email: str = Form(...), user_password: str = Form(...), user_auth: Auth = Depends(get_user_auth)):
+    is_user_exist = await user_auth.get_user_by_email(user_email)  # Removed await
     if not is_user_exist:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User does not exist")
 

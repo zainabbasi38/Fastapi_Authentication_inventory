@@ -15,7 +15,7 @@ class Auth():
         self.db_session = db_session
 
     async def get_user_by_email(self, email: str)->Union[User, None]:
-        print("Enail come ", email)
+        print("Email come ", email)
 
         #transformation of data to run validation
         email_in_lowercase = email.lower()
@@ -68,19 +68,30 @@ class Auth():
         refresh_token_expired_at = datetime.now(timezone.utc) + timedelta(days=7)
         #create acccess tokens
         access_token= jwt.encode(
-            {"sub": user_id, "exp": access_token_expired_at, "iat": issued_at},
+            {"sub": str(user_id), "exp": access_token_expired_at, "iat": issued_at},
             self.access_token_key,
             algorithm='HS256'
         )
         #create refresh token
         refresh_token= jwt.encode(
-            {"sub": user_id, "exp": refresh_token_expired_at, "iat": issued_at},
+            {"sub": str(user_id), "exp": refresh_token_expired_at, "iat": issued_at},
             self.refresh_token_key,
             algorithm='HS256'
         )
 
         return access_token, refresh_token
+    
+    def verify_token(self, token: str, token_type: str = "access")->str:
+        try:
+            key = self.access_token_key if token_type == "access" else self.refresh_token_key
+            verified_token = jwt.decode(token, key , algorithms=["HS256"])
+            return verified_token
+        except jwt.ExpiredSignatureError:
+            print("You session has expired, please login again")
 
+        except jwt.InvalidTokenError:
+            print("Invalid token")
+            
 
 
 

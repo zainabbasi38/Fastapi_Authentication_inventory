@@ -11,3 +11,11 @@ class BaseModel(SQLModel):
     # explicitly
     class Config:
         orm_mode = True
+
+        json_encoders = {   
+
+            UUID: str,  # Convert UUID to string
+
+            datetime: lambda dt: dt.isoformat()  # Convert datetime to ISO format string
+
+        }
