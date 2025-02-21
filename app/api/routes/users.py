@@ -2,12 +2,11 @@ from fastapi import APIRouter, Response, status, Depends, HTTPException, Form
 from sqlmodel import Session, select
 from app.core.db import db_session
 from app.models.users import User
-from app.api.utils.users_auth_utils import Auth
+from app.api.utils.users_auth_utils import Auth , get_user_auth
 
 user_router = APIRouter(prefix="/users", tags=["users"])
 
-def get_user_auth(db_sesion : Session= Depends(db_session))->Auth:
-    return Auth(db_sesion)
+
 
 @user_router.post("/signup", status_code= status.HTTP_201_CREATED)
 async def create_new_user(user_data: User, user_auth: Auth= Depends(get_user_auth)): #called Action
@@ -19,12 +18,12 @@ async def create_new_user(user_data: User, user_auth: Auth= Depends(get_user_aut
     #for username confirmation
     user_name = await user_auth.get_user_by_useranme(user_data.user_name)
     if user_name:
-        raise HTTPException(status_code= status.HTTP_409_CONFLICT, detail="username exist, crate new account")
+        raise HTTPException(status_code= status.HTTP_409_CONFLICT, detail="username exists, create new account")
     
     #for email verification by get_user_email
     user = await user_auth.get_user_by_email(user_data.email)
     if user:
-        raise HTTPException(status_code= status.HTTP_409_CONFLICT, detail="email exist, create new account")
+        raise HTTPException(status_code= status.HTTP_409_CONFLICT, detail="email exists, create new account")
     print(f"user generated password {user_data.password}")
     hashed_password = user_auth.hash_password(user_data.password)
     user_data.password  = hashed_password

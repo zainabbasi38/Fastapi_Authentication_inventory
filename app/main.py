@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from app.core.config import settings
 from app.api.main import api_router
 from app.core.db import init_db
-
+from app.api.utils.users_auth_utils import get_user_auth
 
 
 @asynccontextmanager
@@ -27,5 +27,6 @@ app = FastAPI(
 @app.get("/", status_code=status.HTTP_200_OK)
 async def root():
     return {"status": True, "Message": "Api is running"}
+
 
 app.include_router(api_router)

@@ -88,13 +88,15 @@ class Auth():
             return verified_token
         except jwt.ExpiredSignatureError:
             print("You session has expired, please login again")
+            return "You session has expired, please login again"
 
         except jwt.InvalidTokenError:
             print("Invalid token")
-            
+            return "Invalid token"
 
 
-
+def get_user_auth(db_sesion : Session= Depends(db_session))->Auth:
+    return Auth(db_sesion)
 # user_auth = Auth()
         
 #is classs is callable = yes
