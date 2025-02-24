@@ -20,7 +20,7 @@ async def create_product(product:Product,authorization:str= Header(...), session
    if not istokenverified:
       raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail= f"{istokenverified}")
    
-   return {"status": True, "message": "Product created successfully", "data":istokenverified}
+   return {"status": True, "message": "Product created successfully", "data":istokenverified["sub"]}
    
    
    
