@@ -10,6 +10,7 @@ class BaseModel(SQLModel):
     
     # explicitly
     class Config:
+        
         orm_mode = True
 
         json_encoders = {   

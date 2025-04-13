@@ -7,7 +7,7 @@ from app.api.utils.users_auth_utils import get_user_auth
 product_router = APIRouter(prefix="/products" , tags= ["products"])
 
 @product_router.post("/")
-async def create_product(product:Product,authorization:str= Header(...), session:Session= Depends(get_user_auth)):
+async def create_product(product:Product,db: Session = Depends(db_session),authorization:str= Header(...), session:Session= Depends(get_user_auth)):
    
    if not authorization.startswith("Bearer "):
       raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail= "Unauthorized")
@@ -19,8 +19,12 @@ async def create_product(product:Product,authorization:str= Header(...), session
 
    if not istokenverified:
       raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail= f"{istokenverified}")
-   
-   return {"status": True, "message": "Product created successfully", "data":istokenverified["sub"]}
+   user_id = istokenverified.sub
+   product.user_id = user_id
+   db.add(product)
+   db.commit()
+   db.refresh(product)
+   return {"status": True, "message": "Product created successfully", "data":product}
    
    
    
